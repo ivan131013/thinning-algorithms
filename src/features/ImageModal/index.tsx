@@ -61,7 +61,7 @@ const ImageModal: FunctionComponent<ImageModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Modal Title</ModalHeader>
+        <ModalHeader>Choose size</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <ReactCrop

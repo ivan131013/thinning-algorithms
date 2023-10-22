@@ -14,6 +14,7 @@ import useCanvas from "../../hooks/useCanvas";
 
 interface CanvasProps {
   draw: (ctx: any, frameCount: number) => void;
+  isExportable?: boolean;
   [key: string]: any;
 }
 
@@ -45,10 +46,19 @@ const Canvas = (props: CanvasProps) => {
         style={{ border: "1px solid black" }}
         onClick={handleCanvasClick}
       />
-
-      <Button colorScheme="orange" onClick={exportCanvas}>
-        Export canvas image
-      </Button>
+      {props.isExportable && (
+        <Button
+          colorScheme="orange"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            exportCanvas();
+          }}
+          zIndex={10000000}
+        >
+          Export canvas image
+        </Button>
+      )}
     </VStack>
   );
 };
