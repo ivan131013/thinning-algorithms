@@ -20,6 +20,7 @@ import { Crop } from "react-image-crop";
 import {
   drawBlueSquaresOverLineBreaks,
   drawSquaresOnImageData,
+  markConvergingDivergingLines,
   setOpacityToMaximum,
 } from "../../services/functions";
 
@@ -41,6 +42,7 @@ const HilditchThinning: FunctionComponent<HilditchThinningProps> = ({
   const [hilditchThreshhold, setHilditchThreshhold] = useState<number>(128);
   const [numberOfTearPoints, setNumberOfTearPoints] = useState<number>();
   const [resultMode, setResultMode] = useState<boolean>(false);
+  const [numberOfSpecialPoints, setNumberOfSpecialPoints] = useState<number>();
 
   const [draw2, setDraw2] = useState<any>();
   const [originalDraw, setOriginalDraw] = useState<any>();
@@ -164,8 +166,9 @@ const HilditchThinning: FunctionComponent<HilditchThinningProps> = ({
 
       let thinImage = hilditchThinning(processedImage, hilditchThreshhold);
 
-      let { imageData: circledThinImage } =
-        drawBlueSquaresOverLineBreaks(thinImage);
+      let { imageData: circledThinImage } = drawBlueSquaresOverLineBreaks(
+        markConvergingDivergingLines(thinImage, 10).imageData
+      );
 
       ctx2.clearRect(0, 0, ctx2.canvas.width, ctx2.canvas.height);
       ctx2.putImageData(circledThinImage, 0, 0);
@@ -180,12 +183,20 @@ const HilditchThinning: FunctionComponent<HilditchThinningProps> = ({
           structuredClone(processedImage),
           hilditchThreshhold
         );
-        let { markersCoordinates } = drawBlueSquaresOverLineBreaks(thinImage);
+        let { markersCoordinates } = drawBlueSquaresOverLineBreaks(
+          structuredClone(thinImage)
+        );
+        let { markersCoordinates: divergingMarkersCoordinates } =
+          markConvergingDivergingLines(thinImage, 10);
+
+        setNumberOfSpecialPoints(divergingMarkersCoordinates.length);
         setNumberOfTearPoints(markersCoordinates.length);
         let circledImage = drawSquaresOnImageData(
-          imageData,
-          markersCoordinates
+          drawSquaresOnImageData(imageData, markersCoordinates),
+          divergingMarkersCoordinates,
+          "orange"
         );
+
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.putImageData(circledImage, 0, 0);
       }
@@ -321,6 +332,10 @@ const HilditchThinning: FunctionComponent<HilditchThinningProps> = ({
       </Box>
       <Text>
         Number of tear points: <b>{numberOfTearPoints}</b>
+      </Text>
+
+      <Text>
+        Number of special points: <b>{numberOfSpecialPoints}</b>
       </Text>
     </VStack>
   );

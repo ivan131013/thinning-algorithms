@@ -111,7 +111,8 @@ export function setOpacityToMaximum(imageData: ImageData): ImageData {
 
 export function drawSquaresOnImageData(
   imageData: ImageData,
-  coordinates: { x: number; y: number }[]
+  coordinates: { x: number; y: number }[],
+  color = "red"
 ): ImageData {
   const onScreenCanvas = document.createElement("canvas");
   const onScreenContext = onScreenCanvas.getContext("2d");
@@ -124,7 +125,7 @@ export function drawSquaresOnImageData(
   onScreenCanvas.height = imageData.height;
   onScreenContext.putImageData(imageData, 0, 0);
 
-  onScreenContext.strokeStyle = "red";
+  onScreenContext.strokeStyle = color;
   onScreenContext.lineWidth = 2;
 
   for (const coordinate of coordinates) {
@@ -140,4 +141,80 @@ export function drawSquaresOnImageData(
     imageData.height
   );
   return modifiedImageData;
+}
+
+export function markConvergingDivergingLines(
+  imageData: ImageData,
+  circleRadius: number
+) {
+  const { data, width, height } = imageData;
+
+  let markersCoordinates = [];
+
+  // Helper function to check if a pixel is black
+  function isBlack(x: number, y: number): boolean {
+    if (x < 0 || x >= width || y < 0 || y >= height) {
+      return false;
+    }
+    const index = (y * width + x) * 4;
+    return data[index] === 0 && data[index + 1] === 0 && data[index + 2] === 0;
+  }
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const index = (y * width + x) * 4;
+
+      // Check if the current pixel is part of a black line
+      if (isBlack(x, y)) {
+        let isConverging = false;
+        let isDiverging = false;
+
+        // Check if it's a converging point
+        if (
+          isBlack(x - 1, y) &&
+          isBlack(x + 1, y) &&
+          isBlack(x, y - 1) &&
+          isBlack(x, y + 1)
+        ) {
+          isConverging = true;
+        }
+
+        // Check if it's a diverging point
+        if (
+          (isBlack(x - 1, y) && isBlack(x + 1, y) && isBlack(x, y - 1)) ||
+          (isBlack(x - 1, y) && isBlack(x + 1, y) && isBlack(x, y + 1)) ||
+          (isBlack(x, y - 1) && isBlack(x, y + 1) && isBlack(x - 1, y)) ||
+          (isBlack(x, y - 1) && isBlack(x, y + 1) && isBlack(x + 1, y))
+        ) {
+          isDiverging = true;
+        }
+
+        // If it's a converging or diverging point, draw a circle
+        if (isConverging || isDiverging) {
+          for (let i = -circleRadius; i <= circleRadius; i++) {
+            for (let j = -circleRadius; j <= circleRadius; j++) {
+              if (
+                i * i + j * j <= circleRadius * circleRadius &&
+                isBlack(x + i, y + j)
+              ) {
+                const circleIndex = ((y + j) * width + x + i) * 4;
+                markersCoordinates.push({ x: x, y: y });
+                if (isConverging) {
+                  data[circleIndex] = 0; // Red channel
+                  data[circleIndex + 1] = 255; // Green channel
+                  data[circleIndex + 2] = 0; // Blue channel
+                } else if (isDiverging) {
+                  data[circleIndex] = 255; // Red channel
+                  data[circleIndex + 1] = 160; // Green channel
+                  data[circleIndex + 2] = 0; // Blue channel
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return { imageData, markersCoordinates };
 }

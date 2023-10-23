@@ -20,6 +20,7 @@ import { Crop } from "react-image-crop";
 import {
   drawBlueSquaresOverLineBreaks,
   drawSquaresOnImageData,
+  markConvergingDivergingLines,
   setOpacityToMaximum,
 } from "../../services/functions";
 
@@ -40,6 +41,7 @@ const ZhangSuenThinning: FunctionComponent<ZhangSuenThinningProps> = ({
 }) => {
   const [zhangSuenThreshhold, setZhangSuenThreshhold] = useState<number>(128);
   const [numberOfTearPoints, setNumberOfTearPoints] = useState<number>();
+  const [numberOfSpecialPoints, setNumberOfSpecialPoints] = useState<number>();
   const [draw, setDraw] = useState<any>();
   const [originalDraw, setOriginalDraw] = useState<any>();
   const [resultMode, setResultMode] = useState<boolean>(false);
@@ -189,18 +191,19 @@ const ZhangSuenThinning: FunctionComponent<ZhangSuenThinningProps> = ({
   }
 
   const onZhangSuenThinClick = () => {
-    setDraw(() => (ctx: CanvasRenderingContext2D, frameCount: number) => {
-      let imageData = ctx.getImageData(0, 0, 600, 500);
+    setDraw(() => (ctx2: CanvasRenderingContext2D, frameCount: number) => {
+      let imageData = ctx2.getImageData(0, 0, 600, 500);
       let processedImage = setOpacityToMaximum(imageData);
 
       let thinImage = zhangSuenThinning(processedImage, zhangSuenThreshhold);
-      let { imageData: circledThinImage } =
-        drawBlueSquaresOverLineBreaks(thinImage);
 
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.putImageData(circledThinImage, 0, 0);
+      let { imageData: circledThinImage } = drawBlueSquaresOverLineBreaks(
+        markConvergingDivergingLines(thinImage, 10).imageData
+      );
+
+      ctx2.clearRect(0, 0, ctx2.canvas.width, ctx2.canvas.height);
+      ctx2.putImageData(circledThinImage, 0, 0);
     });
-
     setOriginalDraw(
       () => (ctx: CanvasRenderingContext2D, frameCount: number) => {
         let imageData = ctx.getImageData(0, 0, 600, 500);
@@ -210,13 +213,20 @@ const ZhangSuenThinning: FunctionComponent<ZhangSuenThinningProps> = ({
           structuredClone(processedImage),
           zhangSuenThreshhold
         );
-        let { markersCoordinates } = drawBlueSquaresOverLineBreaks(thinImage);
+        let { markersCoordinates } = drawBlueSquaresOverLineBreaks(
+          structuredClone(thinImage)
+        );
+        let { markersCoordinates: divergingMarkersCoordinates } =
+          markConvergingDivergingLines(thinImage, 10);
+
+        setNumberOfSpecialPoints(divergingMarkersCoordinates.length);
+        setNumberOfTearPoints(markersCoordinates.length);
         let circledImage = drawSquaresOnImageData(
-          imageData,
-          markersCoordinates
+          drawSquaresOnImageData(imageData, markersCoordinates),
+          divergingMarkersCoordinates,
+          "orange"
         );
 
-        setNumberOfTearPoints(markersCoordinates.length);
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.putImageData(circledImage, 0, 0);
       }
@@ -361,6 +371,10 @@ const ZhangSuenThinning: FunctionComponent<ZhangSuenThinningProps> = ({
 
       <Text>
         Number of tear points: <b>{numberOfTearPoints}</b>
+      </Text>
+
+      <Text>
+        Number of tear points: <b>{numberOfSpecialPoints}</b>
       </Text>
     </VStack>
   );
