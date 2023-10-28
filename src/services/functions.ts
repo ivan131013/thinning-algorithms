@@ -1,5 +1,5 @@
 export function drawBlueSquaresOverLineBreaks(imageData: ImageData) {
-  const { width, height, data } = imageData;
+  const { width, height, data } = structuredClone(imageData);
   const squareSize = 5; // Size of the blue square
   const squareColor = [0, 0, 255, 255]; // Blue color (R, G, B, A)
 
@@ -7,7 +7,7 @@ export function drawBlueSquaresOverLineBreaks(imageData: ImageData) {
 
   const isGrayOrBlack = (r: number, g: number, b: number) => {
     // Check if the color is black or gray (adjust the thresholds as needed)
-    return r < 50 && g < 50 && b < 50;
+    return r + g + b < 500;
   };
 
   const drawSquareBorder = (x: number, y: number) => {
@@ -49,9 +49,9 @@ export function drawBlueSquaresOverLineBreaks(imageData: ImageData) {
 
       // Check if the current pixel is part of a black or gray line
       const { r, g, b } = {
-        r: data[index],
-        g: data[index + 1],
-        b: data[index + 2],
+        r: imageData.data[index],
+        g: imageData.data[index + 1],
+        b: imageData.data[index + 2],
       };
 
       if (isGrayOrBlack(r, g, b)) {
@@ -69,9 +69,9 @@ export function drawBlueSquaresOverLineBreaks(imageData: ImageData) {
                 ny < height &&
                 isDiagonal(dx, dy) &&
                 isGrayOrBlack(
-                  data[(ny * width + nx) * 4],
-                  data[(ny * width + nx) * 4 + 1],
-                  data[(ny * width + nx) * 4 + 2]
+                  imageData.data[(ny * width + nx) * 4],
+                  imageData.data[(ny * width + nx) * 4 + 1],
+                  imageData.data[(ny * width + nx) * 4 + 2]
                 )
               ) {
                 isThinDiagonal = true;
@@ -92,7 +92,9 @@ export function drawBlueSquaresOverLineBreaks(imageData: ImageData) {
     }
   }
 
-  return { imageData, markersCoordinates };
+  const localImageData = new ImageData(data, width);
+
+  return { imageData: localImageData, markersCoordinates };
 }
 
 export function setOpacityToMaximum(imageData: ImageData): ImageData {
@@ -199,7 +201,7 @@ export function markConvergingDivergingLines(
                 isBlack(x + i, y + j)
               ) {
                 const circleIndex = ((y + j) * width + x + i) * 4;
-        
+
                 if (isConverging) {
                   data[circleIndex] = 0; // Red channel
                   data[circleIndex + 1] = 255; // Green channel

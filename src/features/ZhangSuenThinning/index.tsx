@@ -197,13 +197,15 @@ const ZhangSuenThinning: FunctionComponent<ZhangSuenThinningProps> = ({
 
       let thinImage = zhangSuenThinning(processedImage, zhangSuenThreshhold);
 
-      // let { imageData: circledThinImage } = drawBlueSquaresOverLineBreaks(
-      //   markConvergingDivergingLines(thinImage, 10).imageData
-      // );
+      let { imageData: circledThinImage } = drawBlueSquaresOverLineBreaks(
+        markConvergingDivergingLines(thinImage, 5).imageData
+      );
 
       ctx2.clearRect(0, 0, ctx2.canvas.width, ctx2.canvas.height);
-      ctx2.putImageData(thinImage, 0, 0);
+      ctx2.putImageData(circledThinImage, 0, 0);
     });
+
+
     setOriginalDraw(
       () => (ctx: CanvasRenderingContext2D, frameCount: number) => {
         let imageData = ctx.getImageData(0, 0, 600, 500);
@@ -374,7 +376,7 @@ const ZhangSuenThinning: FunctionComponent<ZhangSuenThinningProps> = ({
       </Text>
 
       <Text>
-        Number of tear points: <b>{numberOfSpecialPoints}</b>
+        Number of special points: <b>{numberOfSpecialPoints}</b>
       </Text>
     </VStack>
   );

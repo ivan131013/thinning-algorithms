@@ -95,7 +95,7 @@ const HilditchThinning: FunctionComponent<HilditchThinningProps> = ({
   ): ImageData {
     const width = imageData.width;
     const height = imageData.height;
-    const data = new Uint8ClampedArray(imageData.data);
+    const data = new Uint8ClampedArray(structuredClone(imageData.data));
 
     let hasChanged = true;
     let tempData: Uint8ClampedArray;
@@ -139,7 +139,8 @@ const HilditchThinning: FunctionComponent<HilditchThinningProps> = ({
 
           if (A === 1) {
             const C = p2 * p4 * p6;
-            if (C === 0) {
+            const C2 = p2 * p4 * p8;
+            if (C === 0 && C2===0) {
               tempData[(y * width + x) * 4] = 255;
               tempData[(y * width + x) * 4 + 1] = 255;
               tempData[(y * width + x) * 4 + 2] = 255;
