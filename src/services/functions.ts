@@ -1,6 +1,6 @@
 export function drawBlueSquaresOverLineBreaks(imageData: ImageData) {
   const { width, height, data } = structuredClone(imageData);
-  const squareSize = 5; // Size of the blue square
+  const squareSize = 10; // Size of the blue square
   const squareColor = [0, 0, 255, 255]; // Blue color (R, G, B, A)
 
   let markersCoordinates = [];

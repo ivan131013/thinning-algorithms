@@ -185,7 +185,7 @@ const ThinningPage: FunctionComponent<ThinningPageProps> = () => {
         borderRadius={"1rem"}
         p={"2rem"}
       >
-        <Heading fontFamily={"Raleway"}>Thinning algorythms</Heading>
+        <Heading fontFamily={"Raleway"}>Thinning algorithms</Heading>
 
         <VStack>
           {originalBase64Image !== "" && <Heading>Original: </Heading>}

@@ -140,7 +140,7 @@ const HilditchThinning: FunctionComponent<HilditchThinningProps> = ({
           if (A === 1) {
             const C = p2 * p4 * p6;
             const C2 = p2 * p4 * p8;
-            if (C === 0 && C2===0) {
+            if (C === 0 && C2 === 0) {
               tempData[(y * width + x) * 4] = 255;
               tempData[(y * width + x) * 4 + 1] = 255;
               tempData[(y * width + x) * 4 + 2] = 255;
@@ -242,7 +242,7 @@ const HilditchThinning: FunctionComponent<HilditchThinningProps> = ({
 
   return (
     <VStack mt={"2rem"} alignItems={"stretch"}>
-      <Box w={"100%"}>
+      <Box w={"100%"} mb={"1rem"}>
         <Slider
           aria-label="slider-ex-6"
           onChange={(val) => setHilditchThreshhold(val)}

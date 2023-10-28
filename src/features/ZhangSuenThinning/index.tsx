@@ -279,7 +279,7 @@ const ZhangSuenThinning: FunctionComponent<ZhangSuenThinningProps> = ({
 
   return (
     <VStack mt={"2rem"} alignItems={"stretch"}>
-      <Box w={"100%"}>
+      <Box w={"100%"} mb={'1rem'}>
         <Slider
           aria-label="slider-ex-6"
           onChange={(val) => setZhangSuenThreshhold(val)}
