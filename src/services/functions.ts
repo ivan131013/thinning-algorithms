@@ -191,6 +191,7 @@ export function markConvergingDivergingLines(
 
         // If it's a converging or diverging point, draw a circle
         if (isConverging || isDiverging) {
+          markersCoordinates.push({ x: x, y: y });
           for (let i = -circleRadius; i <= circleRadius; i++) {
             for (let j = -circleRadius; j <= circleRadius; j++) {
               if (
@@ -198,7 +199,7 @@ export function markConvergingDivergingLines(
                 isBlack(x + i, y + j)
               ) {
                 const circleIndex = ((y + j) * width + x + i) * 4;
-                markersCoordinates.push({ x: x, y: y });
+        
                 if (isConverging) {
                   data[circleIndex] = 0; // Red channel
                   data[circleIndex + 1] = 255; // Green channel

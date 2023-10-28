@@ -129,7 +129,7 @@ const ZhangSuenThinning: FunctionComponent<ZhangSuenThinningProps> = ({
             const m1 = p2 * p4 * p6;
             const m2 = p4 * p6 * p8;
 
-            if ((m1 === 0 || m2 === 0) && B >= 3) {
+            if ((m1 === 0 && m2 === 0)) {
               // Adjust this condition
               tempData[(y * width + x) * 4] = 255;
               tempData[(y * width + x) * 4 + 1] = 255;
@@ -140,8 +140,8 @@ const ZhangSuenThinning: FunctionComponent<ZhangSuenThinningProps> = ({
         }
       }
 
-      data.set(tempData);
-      tempData = new Uint8ClampedArray(data);
+      data.set(structuredClone(tempData));
+      tempData = new Uint8ClampedArray(structuredClone(data));
 
       for (let y = 1; y < height - 1; y++) {
         for (let x = 1; x < width - 1; x++) {
@@ -169,7 +169,7 @@ const ZhangSuenThinning: FunctionComponent<ZhangSuenThinningProps> = ({
             const m1 = p2 * p4 * p8;
             const m2 = p2 * p6 * p8;
 
-            if ((m1 === 0 || m2 === 0) && B >= 3) {
+            if ((m1 === 0 && m2 === 0)) {
               // Adjust this condition
               tempData[(y * width + x) * 4] = 255;
               tempData[(y * width + x) * 4 + 1] = 255;
@@ -197,12 +197,12 @@ const ZhangSuenThinning: FunctionComponent<ZhangSuenThinningProps> = ({
 
       let thinImage = zhangSuenThinning(processedImage, zhangSuenThreshhold);
 
-      let { imageData: circledThinImage } = drawBlueSquaresOverLineBreaks(
-        markConvergingDivergingLines(thinImage, 10).imageData
-      );
+      // let { imageData: circledThinImage } = drawBlueSquaresOverLineBreaks(
+      //   markConvergingDivergingLines(thinImage, 10).imageData
+      // );
 
       ctx2.clearRect(0, 0, ctx2.canvas.width, ctx2.canvas.height);
-      ctx2.putImageData(circledThinImage, 0, 0);
+      ctx2.putImageData(thinImage, 0, 0);
     });
     setOriginalDraw(
       () => (ctx: CanvasRenderingContext2D, frameCount: number) => {

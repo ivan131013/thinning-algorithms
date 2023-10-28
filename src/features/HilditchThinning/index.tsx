@@ -186,11 +186,12 @@ const HilditchThinning: FunctionComponent<HilditchThinningProps> = ({
         let { markersCoordinates } = drawBlueSquaresOverLineBreaks(
           structuredClone(thinImage)
         );
+
         let { markersCoordinates: divergingMarkersCoordinates } =
           markConvergingDivergingLines(thinImage, 10);
-
         setNumberOfSpecialPoints(divergingMarkersCoordinates.length);
         setNumberOfTearPoints(markersCoordinates.length);
+
         let circledImage = drawSquaresOnImageData(
           drawSquaresOnImageData(imageData, markersCoordinates),
           divergingMarkersCoordinates,
